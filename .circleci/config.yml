@@ -8,7 +8,7 @@ commands:
     steps:
       - slack/notify:
           event: fail
-          channel: $SLACK_DEFAULT_CHANNEL
+          channel: cicd-pipeline
           template: basic_fail_1
 
 #   destroy-environment:
@@ -327,7 +327,7 @@ jobs:
     steps:
       - slack/notify:
           event: pass
-          channel: $SLACK_DEFAULT_CHANNEL
+          channel: cicd-pipeline
           template: success_tagged_deployment_1
 
 workflows:
