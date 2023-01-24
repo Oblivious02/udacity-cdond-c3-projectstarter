@@ -351,7 +351,10 @@ jobs:
 
             sudo npm install --global n
             sudo n 13.8.0
-            
+      - run:
+          name: Install rsync
+          command: |
+            sudo apt install -y rsync
       - run:
           name: Deploy backend
           command: |
