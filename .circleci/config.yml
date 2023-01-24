@@ -216,7 +216,7 @@ jobs:
       - checkout       
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["8d:3e:53:3f:96:70:3d:53:80:e4:eb:08:23:19:9e:8f"]
+          fingerprints: ["05:a2:d9:ac:18:61:41:24:27:a3:9b:57:58:4c:ff:ad"]
       # attach workspace
       - attach_workspace:
           at: ~/
@@ -287,7 +287,6 @@ jobs:
       # Checkout code from git
       - checkout
 
-
       - run:
           name: Install dependencies
           command: |
@@ -345,7 +344,7 @@ jobs:
       - checkout       
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["8d:3e:53:3f:96:70:3d:53:80:e4:eb:08:23:19:9e:8f"]
+          fingerprints: ["05:a2:d9:ac:18:61:41:24:27:a3:9b:57:58:4c:ff:ad"]
       # attach workspace
       - attach_workspace:
           at: ~/
@@ -383,6 +382,30 @@ jobs:
       # Here's where you will add some code to rollback on failure  
       - revert-migrations
       - destroy-environment     
+  # cleanup:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Get old stack workflow id and Cleanup
+  #         command: |           
+  #           export OldWorkflowID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET_ID}/old_workflow_id)
+  #           export STACKS=($(aws --region us-west-2 cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+  #           echo OldWorkflowID: "${OldWorkflowID}"
+  #           echo CIRCLE_WORKFLOW_ID "$CIRCLE_WORKFLOW_ID"
+  #           echo Stack names: "${STACKS[@]}"
+  #           if [[ ${STACKS[@]} =~ "${OldWorkflowID}" ]]
+  #           then
+  #             aws --region us-west-2 s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+  #             aws --region us-west-2 cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+  #             aws --region us-west-2 cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+  #             echo "=======================Delete Confirmed========================"
+  #           else
+  #             echo "=======================Didn't delete========================"            
+  #           fi
+            
+
 
 
 workflows:
