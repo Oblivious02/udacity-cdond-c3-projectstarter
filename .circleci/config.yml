@@ -343,53 +343,53 @@ jobs:
       - revert-migrations
       - destroy-environment     
                     
-    deploy-backend:
-      docker:
-        - image: cimg/node:13.8.0
-          environment:
-            NODE_ENV: "local"
-            VERSION: "1"
-            ENVIRONMENT: "production"
-            TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-            TYPEORM_HOST: $TYPEORM_HOST
-            TYPEORM_USERNAME: $TYPEORM_USERNAME
-            TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-            TYPEORM_DATABASE: $TYPEORM_DATABASE
-            TYPEORM_PORT: $TYPEORM_PORT
-            TYPEORM_ENTITIES: $TYPEORM_ENTITIES
-      steps:
-        - checkout
-        - env-setup
-        - install_nodejs
-        - install_ansible
-        - add_ssh_keys:
-            fingerprints: ["05:a2:d9:ac:18:61:41:24:27:a3:9b:57:58:4c:ff:ad"]
-        - attach_workspace:
-            at: ~/
-        - restore_cache:
-            keys: [backend-build]
-        - run:
-            name: Install dependencies
-            command: |
-              cd backend
-              npm i
-        - run:
-            name: package backend
-            command: |
-              cd backend
-              npm i 
-              npm run build
-              cd ../
-              tar -czf artifact.tar.gz backend
-              cp artifact.tar.gz .circleci/ansible/roles/deploy/tasks/files
-        - run:
-            name: Deploy backend
-            command: |
-              cd .circleci/ansible
-              cat inventory.txt
-              ansible-playbook -i inventory.txt deploy-backend.yml 
-        - destroy-environment
-        - revert-migrations  
+  deploy-backend:
+    docker:
+      - image: cimg/node:13.8.0
+        environment:
+          NODE_ENV: "local"
+          VERSION: "1"
+          ENVIRONMENT: "production"
+          TYPEORM_CONNECTION: $TYPEORM_CONNECTION
+          TYPEORM_HOST: $TYPEORM_HOST
+          TYPEORM_USERNAME: $TYPEORM_USERNAME
+          TYPEORM_PASSWORD: $TYPEORM_PASSWORD
+          TYPEORM_DATABASE: $TYPEORM_DATABASE
+          TYPEORM_PORT: $TYPEORM_PORT
+          TYPEORM_ENTITIES: $TYPEORM_ENTITIES
+    steps:
+      - checkout
+      - env-setup
+      - install_nodejs
+      - install_ansible
+      - add_ssh_keys:
+          fingerprints: ["05:a2:d9:ac:18:61:41:24:27:a3:9b:57:58:4c:ff:ad"]
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm i
+      - run:
+          name: package backend
+          command: |
+            cd backend
+            npm i 
+            npm run build
+            cd ../
+            tar -czf artifact.tar.gz backend
+            cp artifact.tar.gz .circleci/ansible/roles/deploy/tasks/files
+      - run:
+          name: Deploy backend
+          command: |
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml 
+      - destroy-environment
+      - revert-migrations  
   # cleanup:
   #   docker:
   #     - image: amazon/aws-cli
