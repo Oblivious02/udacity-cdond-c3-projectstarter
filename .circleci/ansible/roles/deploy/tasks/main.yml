@@ -1,4 +1,4 @@
- - name: install rsync on the ansible controller
+- name: install rsync on the ansible controller
     become: yes
     connection: local
     package:
