@@ -344,6 +344,13 @@ jobs:
             sudo apt install ansible -y
 #              pip install --upgrade
       - run:
+          name: Install NodeJS
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt install --global n
+            sudo n 13.8.0
+            
+      - run:
           name: Deploy backend
           command: |
             # your code here
