@@ -219,7 +219,7 @@ jobs:
       # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: ["05:a2:d9:ac:18:61:41:24:27:a3:9b:57:58:4c:ff:ad"]
-      # attach workspace
+
       - attach_workspace:
           at: ~/
 
@@ -228,12 +228,7 @@ jobs:
           command: |
               apk add --update tar gzip ansible
               pip install awscli
-#              pip install --upgrade pip
-#              pip install ansible
-#              pip install awscli
-#            apk update && apk add --no-cache musl-dev libffi-dev openssl-dev make gcc python py2-pip python-dev
-#            pip install --upgrade pip
-#            pip install cffi
+              
       - run:
           name: Configure server
           command: |
@@ -257,12 +252,10 @@ jobs:
 
   run-migrations:
     docker:
-      # Docker image here that supports NodeJS
-        - image: cimg/node:13.8.0
+      - image: sleavely/node-awscli:14.x
     steps:
       # Checkout code from git
       - checkout
-      - install_awscli
       - run:
           name: Run migrations
           command: |
@@ -293,19 +286,6 @@ jobs:
             yum install -y tar gzip curl
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs              
-      # - run:
-      #     name: Install node
-      #     command: |
-      #       curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-      #       export NVM_DIR="$HOME/.nvm"
-      #       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-      #       nvm install 16
-
-      # - run:
-      #     name: Install ansible and awscli
-      #     command: |
-      #       pip3 install ansible
-      #       pip3 install awscli
 
       - run:
           name: Get backend url
