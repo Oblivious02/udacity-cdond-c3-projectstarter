@@ -319,7 +319,7 @@ jobs:
     docker:
       - image: python:3.7-alpine3.11
         environment:
-          NODE_ENV: "local"
+          NODE_ENV: "production"
           VERSION: "1"
           ENVIRONMENT: "production"
           TYPEORM_CONNECTION: $TYPEORM_CONNECTION
@@ -328,28 +328,30 @@ jobs:
           TYPEORM_PASSWORD: $TYPEORM_PASSWORD
           TYPEORM_DATABASE: $TYPEORM_DATABASE
           TYPEORM_PORT: $TYPEORM_PORT
-          TYPEORM_ENTITIES: $TYPEORM_ENTITIES
+          TYPEORM_ENTITIES: $TYPEORM_ENTITIES       
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints: ["05:a2:d9:ac:18:61:41:24:27:a3:9b:57:58:4c:ff:ad"]
-      - attach_workspace:
-          at: /root
+      - attach_workspace: 
+          at: ~/
+      - restore_cache:
+          keys:
+            - build-backend
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible rsync 
-            apk add curl
-            pip3 install awscli
+            apk add --update ansible nodejs npm tar gzip
       - run:
           name: Deploy backend
           command: |
-            ls /root
-            ls /root/project/backend/
+            cd backend
+            npm install
+            npm run build
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
             cat ~/project/.circleci/ansible/inventory.txt
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
-      # Here's where you will add some code to rollback on failure
-      - destroy-environment    
+            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml  
   # cleanup:
   #   docker:
   #     - image: amazon/aws-cli
