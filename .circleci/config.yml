@@ -278,48 +278,50 @@ jobs:
       - revert-migrations
   
   deploy-backend:
-    docker: 
-      - image: cimg/python:3.10
-    steps:
-      - checkout
-      - install_ansible
-      - install_awscli
-      - install_nodejs
-      - restore_cache:
-          keys: [backend-deps]
+    docker:
+      # Docker image here that supports Ansible
+      - image: cimg/python:3.7-node
+    steps:    
+      - checkout       
+      # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: ["05:a2:d9:ac:18:61:41:24:27:a3:9b:57:58:4c:ff:ad"]
       - attach_workspace:
           at: ~/
       - run:
-          name: Install dependencies
+          name: Install aws dependencies
           command: |
-            cd backend
-            npm install
-            npm run build
-            cd ..
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       - run:
-          name: Package Backend
+          name: Install Ansible
           command: |
-            tar -C backend -czvf artifact.tar.gz .
-            cp artifact.tar.gz  ~/
-      - run:
-          name: Checking the existence of inventory.txt && artifact.tar.gz file
-          command: |
-            cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
-            cat inventory.txt
-            echo "Contents of files folder is -------"
-            ls ~/
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+#              pip install --upgrade
       - run:
           name: Deploy backend
           command: |
+            # your code here
+            cd backend # echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            npm i
+            npm run build
+            cd ..
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+            mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
             cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy-environment
+            ansible-playbook -i inventory.txt deploy-backend.yml -v
+      # Here's where you will add some code to rollback on failure  
       - revert-migrations
-  
+      - destroy-environment     
+      
   smoke-test:
     docker:
       - image: cimg/base:stable
