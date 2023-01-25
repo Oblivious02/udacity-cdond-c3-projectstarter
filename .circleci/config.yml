@@ -227,7 +227,6 @@ jobs:
     docker:
       - image: sleavely/node-awscli:14.x
     steps:
-      # Checkout code from git
       - checkout
       - run:
           name: Run migrations
@@ -292,19 +291,6 @@ jobs:
           fingerprints: ["05:a2:d9:ac:18:61:41:24:27:a3:9b:57:58:4c:ff:ad"]
       - attach_workspace:
           at: ~/
-      # - run:
-      #     name: Deploy backend
-      #     command: |
-      #       cd backend
-      #       npm install
-      #       npm run build
-      #       cd ..
-      #       tar -C backend -czvf artifact.tar.gz .
-      #       mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
-      #       mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
-      #       cd .circleci/ansible
-      #       echo "Contents of the inventory.txt file is ------$(cat inventory.txt)"
-      #       ansible-playbook -i inventory.txt deploy-backend.yml
       - run:
           name: Install dependencies
           command: |
